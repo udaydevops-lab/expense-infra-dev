@@ -38,6 +38,7 @@ resource "null_resource" "backend" {
         inline = [
             "chmod +x /tmp/${var.common_tags.Component}.sh",
             "sudo sh /tmp/${var.common_tags.Component}.sh ${var.common_tags.Component} ${var.environment}"
+            # sudo sh backend.sh backend dev
         ]
     } 
 }
@@ -115,7 +116,7 @@ resource "aws_launch_template" "backend" {
 
 resource "aws_autoscaling_group" "backend" {
   name                      = "${var.project_name}-${var.environment}-${var.common_tags.Component}"
-  max_size                  = 3
+  max_size                  = 2
   min_size                  = 1
   health_check_grace_period = 300
   health_check_type         = "ELB"
@@ -130,7 +131,7 @@ resource "aws_autoscaling_group" "backend" {
   instance_refresh {
     strategy = "Rolling"
     preferences {
-      min_healthy_percentage = 80
+      min_healthy_percentage = 50
     }
     triggers = ["launch_template"]
   }
